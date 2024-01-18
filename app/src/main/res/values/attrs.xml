@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="BiDirectionalSeekBar">
+        <attr name="BDS_indicatorColor" format="color"/>
+        <attr name="BDS_stickColor" format="color" />
+        <attr name="BDS_stickGap" format="dimension" />
+        <attr name="BDS_zeroStickColor" format="color" />
+        <attr name="BDS_labelColor" format="color" />
+        <attr name="BDS_minValue" format="integer" />
+        <attr name="BDS_maxValue" format="integer" />
+        <attr name="BDS_progress" format="integer" />
+    </declare-styleable>
+
+</resources>
