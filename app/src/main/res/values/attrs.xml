@@ -11,4 +11,15 @@
         <attr name="BDS_progress" format="integer" />
     </declare-styleable>
 
+    <declare-styleable name="HorizontalWheelView">
+        <attr name="tickHeight" format="dimension"/>
+        <attr name="tickWidth" format="dimension"/>
+        <attr name="tickCount" format="integer"/>
+        <attr name="tickColor" format="color"/>
+        <attr name="tickDegreesRange" format="integer"/>
+        <attr name="tickFadingEdgePercent" format="integer"/>
+        <attr name="intermediateTickCount" format="integer"/>
+        <attr name="intermediateTickColor" format="color"/>
+        <attr name="labelTickColor" format="color"/>
+    </declare-styleable>
 </resources>
