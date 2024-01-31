@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.SolarTimePicker" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.SolarTimePicker" parent="Theme.Material3.Light.NoActionBar">
+        <item name="android:textColorPrimary">@color/primary_text_selector</item>
+        <item name="textAppearanceCaption3">@style/TextAppearance.CommonTheme.Caption3</item>
+
+        <item name="android:dividerHeight">@dimen/divider</item>
+    </style>
 </resources>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="TextAppearance.CommonTheme.Base" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:textColor">?android:textColorPrimary</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:fontFamily">@font/suisse_family</item>
+        <item name="fontFamily">@font/suisse_family</item>
+        <item name="android:fontFeatureSettings">"tnum, lnum"</item>
+    </style>
+
+    <style name="TextAppearance.CommonTheme.Caption3" parent="TextAppearance.CommonTheme.Base">
+        <item name="android:textSize">11sp</item>
+        <item name="android:letterSpacing">0.01</item>
+        <item name="lineHeight">14sp</item>
+    </style>
+</resources>

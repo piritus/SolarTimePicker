@@ -178,7 +178,7 @@ class HorizontalWheelView @JvmOverloads constructor(
     }
 
     fun setRotate(percent: Float, coerced: Boolean = false) {
-        val targetScrollDistance = percent.coerceIn(0f, 100f) * wheelArcLength
+        val targetScrollDistance = percent.coerceIn(0f, 100f) * wheelArcLength //TODO скорее всего, coerceIn(0f, 1f)
         if (coerced) {
             if (!scroller.isFinished) scroller.abortAnimation()
             isScrolling = false
