@@ -173,16 +173,27 @@ class SunCircleView @JvmOverloads constructor(
                         LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
 
                     context.withStyledAttributes(attrs, R.styleable.SunCircleView, defStyleAttr) {
-                        getDrawable(R.styleable.SunCircleView_SCV_label_background)?.let {
-                            this@apply.background = it
-                        }
+                        getDrawable(R.styleable.SunCircleView_SCV_label_background)
+                            ?: AppCompatResources.getDrawable(
+                                context,
+                                R.drawable.label_stroke_bg
+                            )?.let {
+                                this@apply.background = it
+                            }
 
                         getString(
                             when (it) {
                                 BadgeType.SUNRISE -> R.styleable.SunCircleView_SCV_sunriseText
                                 BadgeType.SUNSET -> R.styleable.SunCircleView_SCV_sunsetText
                             }
-                        )?.let {
+                        ) ?: run {
+                            context.getString(
+                                when (it) {
+                                    BadgeType.SUNRISE -> R.string.scv_sunrise_text
+                                    BadgeType.SUNSET -> R.string.scv_sunset_text
+                                }
+                            )
+                        }.let {
                             this@apply.text = it
                         }
 
@@ -290,7 +301,7 @@ class SunCircleView @JvmOverloads constructor(
             pointX =
                 if ((x - childSemiWidth) < (pathPadding)) {
                     (l + pathPadding + childSemiWidth).toFloat()
-                } else if ((x + childSemiWidth) > (r -l - pathPadding)) {
+                } else if ((x + childSemiWidth) > (r - l - pathPadding)) {
                     (r - pathPadding - childSemiWidth).toFloat()
                 } else {
                     x
