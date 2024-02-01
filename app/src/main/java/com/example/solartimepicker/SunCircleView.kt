@@ -173,15 +173,15 @@ class SunCircleView @JvmOverloads constructor(
                         LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
 
                     context.withStyledAttributes(attrs, R.styleable.SunCircleView, defStyleAttr) {
-                        getDrawable(R.styleable.SunCircleView_SCV_label_background)
+                        (getDrawable(R.styleable.SunCircleView_SCV_label_background)
                             ?: AppCompatResources.getDrawable(
                                 context,
                                 R.drawable.label_stroke_bg
-                            )?.let {
+                            ))?.let {
                                 this@apply.background = it
                             }
 
-                        getString(
+                        (getString(
                             when (it) {
                                 BadgeType.SUNRISE -> R.styleable.SunCircleView_SCV_sunriseText
                                 BadgeType.SUNSET -> R.styleable.SunCircleView_SCV_sunsetText
@@ -193,7 +193,7 @@ class SunCircleView @JvmOverloads constructor(
                                     BadgeType.SUNSET -> R.string.scv_sunset_text
                                 }
                             )
-                        }.let {
+                        }).let {
                             this@apply.text = it
                         }
 
