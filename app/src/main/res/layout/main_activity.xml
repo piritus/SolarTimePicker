@@ -62,8 +62,10 @@
         android:background="#40ff"
         app:tickDegreesRange="120"
         app:tickWidth="1dp"
-        app:tickColor="@color/purple_700"
-        app:intermediateTickColor="@color/purple_500"
+        app:tickHeight="8dp"
+        app:tickColor="#090714"
+        app:tickFadingEdgePercent="55"
+        app:intermediateTickColor="#26090714"
         app:labelTickColor="@color/teal_200"/>
 
     <LinearLayout

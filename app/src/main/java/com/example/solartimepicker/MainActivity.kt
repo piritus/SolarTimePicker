@@ -12,6 +12,9 @@ import android.widget.TextView
 import androidx.activity.ComponentActivity
 import com.example.solartimepicker.model.ShadowMap
 import com.example.solartimepicker.solarseekbar.BiDirectionalSeekBar
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 
 class MainActivity : ComponentActivity() {
@@ -22,6 +25,14 @@ class MainActivity : ComponentActivity() {
         private const val KEY_SUNSET = "key_sunset"
         private const val KEY_DIRECTION = "key_direction"
 
+    }
+
+    private val dateFormat by lazy { SimpleDateFormat("HH:mm", Locale.getDefault()) }
+
+    private val startTime = Calendar.getInstance().apply {
+        set(Calendar.HOUR_OF_DAY, 7)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.MILLISECOND, 0)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,10 +76,14 @@ class MainActivity : ComponentActivity() {
             }
         })
 
+        var lastTick = -1
         wheelView.onRotateListener = HorizontalWheelView.OnRotateListener { percent, tick, offset ->
             Log.d("TAG", "onRotate: percent=$percent, tick=$tick, offset=$offset")
-            tickText1.text = tick.toString()
-            tickText2.text = (tick + 1).toString()
+            if(tick != lastTick) {
+                lastTick = tick
+                tickText1.text = tick.time()
+                tickText2.text = (tick + 1).time()
+            }
             tickText1.translationY = -tickText2.height * offset
             tickText2.translationY = tickText2.height * (1 - offset)
 
@@ -76,9 +91,15 @@ class MainActivity : ComponentActivity() {
         }
 
         // Sun circular
-        val sunriseAnglePref = getFromPreferences(KEY_SUNRISE, "").takeIf { it.isNotEmpty() }?.toIntOrNull()?.coerceIn(0, 360)
-        val sunsetAnglePref = getFromPreferences(KEY_SUNSET, "").takeIf { it.isNotEmpty() }?.toIntOrNull()?.coerceIn(0, 360)
-        val directionPosPref = getFromPreferences(KEY_DIRECTION, "").takeIf { it.isNotEmpty() }?.toIntOrNull()?.coerceIn(0, 1)
+        val sunriseAnglePref =
+            getFromPreferences(KEY_SUNRISE, "").takeIf { it.isNotEmpty() }?.toIntOrNull()
+                ?.coerceIn(0, 360)
+        val sunsetAnglePref =
+            getFromPreferences(KEY_SUNSET, "").takeIf { it.isNotEmpty() }?.toIntOrNull()
+                ?.coerceIn(0, 360)
+        val directionPosPref =
+            getFromPreferences(KEY_DIRECTION, "").takeIf { it.isNotEmpty() }?.toIntOrNull()
+                ?.coerceIn(0, 1)
         val directionPref = directionPosPref?.let {
             ShadowMap.Direction.entries.getOrNull(it)
         }
@@ -88,9 +109,9 @@ class MainActivity : ComponentActivity() {
         directionPref?.let { spinner.setSelection(directionPosPref) }
 
         val shadowMap = ShadowMap(
-            sunriseAngle = sunriseAnglePref?:220,
-            sunsetAngle = sunsetAnglePref?:40,
-            direction = directionPref?:ShadowMap.Direction.COUNTERCLOCKWISE
+            sunriseAngle = sunriseAnglePref ?: 220,
+            sunsetAngle = sunsetAnglePref ?: 40,
+            direction = directionPref ?: ShadowMap.Direction.COUNTERCLOCKWISE
         )
         circleView.initialize(shadowMap)
         circleView.invalidate()
@@ -136,6 +157,17 @@ class MainActivity : ComponentActivity() {
     private fun getFromPreferences(key: String, defaultValue: String): String {
         val sharedPref: SharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         return sharedPref.getString(key, defaultValue) ?: defaultValue
+    }
+
+    private fun Int.time(): String {
+        val time = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 7)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        time.add(Calendar.MINUTE, this * 10)
+        return dateFormat.format(time.time)
     }
 }
 
