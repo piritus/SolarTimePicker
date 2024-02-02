@@ -16,6 +16,8 @@ import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.GestureDetectorCompat
 import kotlin.math.absoluteValue
+import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.math.roundToInt
 import kotlin.properties.Delegates
 
@@ -156,10 +158,9 @@ class HorizontalWheelView @JvmOverloads constructor(
         }
 
         override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-            val distanceDelta = coerceDistanceDelta(e.x - wheelCenterX).toInt()
-            return if (distanceDelta != 0) {
-                scroller.startScroll(scrollDistance.toInt(), 0, distanceDelta, 0)
-                postInvalidateOnAnimation()
+            val distanceDelta = coerceDistanceDelta(e.x - wheelCenterX)
+            return if (distanceDelta.absoluteValue > 1) {
+                startScroll(distanceDelta.toInt())
                 performClick()
                 true
             } else {
@@ -191,13 +192,7 @@ class HorizontalWheelView @JvmOverloads constructor(
     fun setRotate(percent: Float, coerced: Boolean = false) {
         val targetScrollDistance = percent.coerceIn(0f, 1f) * wheelArcLength //TODO скорее всего, coerceIn(0f, 1f)
         if (coerced) {
-            if (!scroller.isFinished) scroller.abortAnimation()
-            isScrolling = false
-            val distanceDelta = coerceDistanceDelta(targetScrollDistance - scrollDistance).toInt()
-            if (distanceDelta != 0) {
-                scroller.startScroll(scrollDistance.toInt(), 0, distanceDelta, 0)
-                postInvalidateOnAnimation()
-            }
+            coerceScrollDistance(targetScrollDistance)
         } else {
             scrollDistance = targetScrollDistance
             postInvalidate()
@@ -205,9 +200,7 @@ class HorizontalWheelView @JvmOverloads constructor(
     }
 
     fun coerceRotate() {
-        if (!scroller.isFinished) scroller.abortAnimation()
-        isScrolling = false
-        coerceScrollDistance()
+        coerceScrollDistance(scrollDistance)
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -232,7 +225,7 @@ class HorizontalWheelView @JvmOverloads constructor(
             scrollDistance = scroller.currX.toFloat()
             postInvalidateOnAnimation()
         } else if (!isScrolling) {
-            coerceScrollDistance()
+            coerceScrollDistance(scrollDistance)
         }
     }
 
@@ -311,14 +304,21 @@ class HorizontalWheelView @JvmOverloads constructor(
         tickDegreesDelta = if (tickCount > 0) tickDegreesRange / tickCount.toFloat() else 0f
     }
 
-    private fun coerceScrollDistance() {
-        val distanceDelta = coerceDistanceDelta(0f)
+    private fun coerceScrollDistance(targetScrollDistance: Float) {
+        val distanceDelta = coerceDistanceDelta(targetScrollDistance - scrollDistance)
         if (distanceDelta.absoluteValue > 1) {
-            scroller.startScroll(scrollDistance.toInt(), 0, distanceDelta.toInt(), 0)
-            postInvalidateOnAnimation()
+            startScroll(distanceDelta.toInt())
         } else {
             scrollDistance += distanceDelta
         }
+    }
+
+    private fun startScroll(distance: Int) {
+        val startX = if (distance > 0) floor(scrollDistance) else ceil(scrollDistance)
+        if (!scroller.isFinished) scroller.abortAnimation()
+        isScrolling = false
+        scroller.startScroll(startX.toInt(), 0, distance, 0)
+        postInvalidateOnAnimation()
     }
 
     private fun calculateClosestTickIndex(scrollDistance: Float): Int {

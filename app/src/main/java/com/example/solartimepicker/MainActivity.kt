@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.activity.ComponentActivity
 import com.example.solartimepicker.model.ShadowMap
 import com.example.solartimepicker.solarseekbar.BiDirectionalSeekBar
+import kotlin.math.absoluteValue
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -77,16 +78,14 @@ class MainActivity : ComponentActivity() {
         })
 
         var lastTick = -1
+        val tickViews = listOf(tickText1, tickText2)
         wheelView.onRotateListener = HorizontalWheelView.OnRotateListener { percent, tick, offset ->
             Log.d("TAG", "onRotate: percent=$percent, tick=$tick, offset=$offset")
-            if(tick != lastTick) {
-                lastTick = tick
-                tickText1.text = tick.time()
-                tickText2.text = (tick + 1).time()
-            }
-            tickText1.translationY = -tickText2.height * offset
-            tickText2.translationY = tickText2.height * (1 - offset)
-
+            val viewHeight = tickText1.height
+            val translation = viewHeight * -offset
+            val closestTickView = tickViews.minBy { (it.translationY - translation).absoluteValue }
+            val otherTickView = tickViews.first { it != closestTickView }
+            otherTickView.updateTickView(tick + 1, viewHeight * (1 - offset))
             circleView.setSunAngle(percent)
         }
 
@@ -171,6 +170,11 @@ class MainActivity : ComponentActivity() {
         }
         time.add(Calendar.MINUTE, this * 10)
         return dateFormat.format(time.time)
+    }
+
+    private fun TextView.updateTickView(tick: Int, translation: Float) {
+        text = tick.time()
+        translationY = translation
     }
 }
 
