@@ -26,6 +26,7 @@
     </declare-styleable>
 
     <declare-styleable name="SunCircleView">
+        <attr name="SCV_isDraggable" format="boolean"/>
         <attr name="SCV_label_background" format="reference"/>
         <attr name="SCV_label_textAppearance" format="reference"/>
         <attr name="SCV_icon" format="reference"/>

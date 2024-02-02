@@ -9,6 +9,7 @@ import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Scroller
 import androidx.core.content.withStyledAttributes
@@ -22,7 +23,7 @@ class HorizontalWheelView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : View(context, attrs, defStyleAttr) {
+) : ViewGroup(context, attrs, defStyleAttr) {
 
     fun interface OnRotateListener {
         fun onRotate(rangePercent: Float, tick: Int, tickOffset: Float)
@@ -102,6 +103,7 @@ class HorizontalWheelView @JvmOverloads constructor(
     var intermediateTickCount: Int = 5
         set(value) { field = value.coerceAtLeast(0) }
 
+    // Регулирует расстояние между делениями
     var tickDegreesRange: Int = 120
         set(value) {
             field = value.coerceIn(0, 360)
@@ -187,7 +189,7 @@ class HorizontalWheelView @JvmOverloads constructor(
     }
 
     fun setRotate(percent: Float, coerced: Boolean = false) {
-        val targetScrollDistance = percent.coerceIn(0f, 100f) * wheelArcLength //TODO скорее всего, coerceIn(0f, 1f)
+        val targetScrollDistance = percent.coerceIn(0f, 1f) * wheelArcLength //TODO скорее всего, coerceIn(0f, 1f)
         if (coerced) {
             if (!scroller.isFinished) scroller.abortAnimation()
             isScrolling = false
@@ -243,8 +245,8 @@ class HorizontalWheelView @JvmOverloads constructor(
         wheelCenterX = paddingLeft + paddedWidth * 0.5f
     }
 
-    override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
+    override fun dispatchDraw(canvas: Canvas) {
+        super.dispatchDraw(canvas)
         val tickDegreesDelta = tickDegreesDelta
         val wheelArcLength = wheelArcLength
         val tickLineStartY = tickCenterY - tickHeight * 0.7f
@@ -295,6 +297,10 @@ class HorizontalWheelView @JvmOverloads constructor(
         }
 
         canvas.drawLine(wheelCenterX, 0f, wheelCenterX, tickLineStopY, labelTickPaint)
+    }
+
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+//        TODO("Not yet implemented")
     }
 
     private fun recalculateWheelArcLength() {

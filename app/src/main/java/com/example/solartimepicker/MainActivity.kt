@@ -113,6 +113,9 @@ class MainActivity : ComponentActivity() {
             sunsetAngle = sunsetAnglePref ?: 40,
             direction = directionPref ?: ShadowMap.Direction.COUNTERCLOCKWISE
         )
+        circleView.onRotateListener = SunCircleView.OnRotateListener {factor->
+            wheelView.setRotate(factor)
+        }
         circleView.initialize(shadowMap)
         circleView.invalidate()
 

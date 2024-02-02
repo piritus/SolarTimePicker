@@ -9,7 +9,7 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.view.GestureDetector
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +18,10 @@ import androidx.core.content.withStyledAttributes
 import com.example.solartimepicker.model.ShadowMap
 import com.google.android.material.textview.MaterialTextView
 import kotlin.math.abs
+import kotlin.math.atan2
 import kotlin.math.cos
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.sin
 import kotlin.properties.Delegates
 
@@ -29,6 +32,16 @@ class SunCircleView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : ViewGroup(context, attrs, defStyleAttr) {
 
+    fun interface OnRotateListener {
+        fun onRotate(factor: Float)
+    }
+
+    // Переменные для перемещения иконки жестом
+    private var startX = 0f
+    private var startY = 0f
+    private var isIconTouched = false
+
+    // Отступ от бейджа (восход/закат) по вертикали
     private val badgeVerticalMargin = 16.dp
     private var currentFact = 0f
     private var iconRect = Rect()
@@ -41,6 +54,8 @@ class SunCircleView @JvmOverloads constructor(
     private var icon: Drawable? = null
 
     private var isInitialized = false
+    private var isDraggable = false
+    private var isScrolling = false
 
     private var radius: Float by Delegates.notNull()
     private var centerX: Float by Delegates.notNull()
@@ -52,7 +67,9 @@ class SunCircleView @JvmOverloads constructor(
         angle = newValue
     }
 
-    // Ширина обводки
+    var onRotateListener: OnRotateListener? = null
+
+    // Направление движения
     private var isClockwise: Boolean by Delegates.observable(true) { _, _, newValue ->
         sweepAngle *= -1
         angleStep *= -1
@@ -95,47 +112,6 @@ class SunCircleView @JvmOverloads constructor(
         style = Paint.Style.FILL
     }
 
-    private val gestureDetector =
-        GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
-            var startX = 0f
-            var startY = 0f
-            var isIconTouched = false
-
-            override fun onDown(e: MotionEvent): Boolean {
-                startX = e.x
-                startY = e.y
-
-                isIconTouched = iconRect.contains(
-                    startX.toInt(),
-                    startY.toInt()
-                )
-
-                if (isIconTouched) {
-                    currentFact = (angle - startAngle) / sweepAngle
-                }
-
-                return true
-            }
-
-            override fun onScroll(
-                e1: MotionEvent?,
-                e2: MotionEvent,
-                distanceX: Float,
-                distanceY: Float
-            ): Boolean {
-                if (!isIconTouched) {
-                    return false
-                }
-
-                val distX = e2.x - (e1?.x ?: width.toFloat())
-                val distY = (e1?.y ?: height.toFloat()) - e2.y
-                val commonFactor = distX / width + distY / height
-                updateSunAngle(commonFactor)
-
-                return true
-            }
-        })
-
     private val badges: List<View>
 
     init {
@@ -144,6 +120,7 @@ class SunCircleView @JvmOverloads constructor(
         badges.forEach { addView(it) }
 
         context.withStyledAttributes(attrs, R.styleable.SunCircleView, defStyleAttr) {
+            isDraggable = getBoolean(R.styleable.SunCircleView_SCV_isDraggable, false)
             circlePaint.color =
                 getColor(R.styleable.SunCircleView_SCV_pathColor, Color.DKGRAY)
 
@@ -178,8 +155,8 @@ class SunCircleView @JvmOverloads constructor(
                                 context,
                                 R.drawable.label_stroke_bg
                             ))?.let {
-                                this@apply.background = it
-                            }
+                            this@apply.background = it
+                        }
 
                         (getString(
                             when (it) {
@@ -212,13 +189,147 @@ class SunCircleView @JvmOverloads constructor(
         }
     }
 
-    /** Раскомментировать, если нужно будет двигать за иконку */
-//    @SuppressLint("ClickableViewAccessibility")
-//    override fun onTouchEvent(event: MotionEvent): Boolean {
-//        return gestureDetector.onTouchEvent(event)
-//    }
+    /** Обработка тача для перемещения иконки по окружности */
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+
+        if (!isInitialized || !isDraggable) {
+            return false
+        }
+
+        if (event.actionMasked == MotionEvent.ACTION_DOWN) {
+            isScrolling = true
+            startX = event.x
+            startY = event.y
+
+            isIconTouched = iconRect.contains(
+                startX.toInt(),
+                startY.toInt()
+            )
+            return true
+        } else if (event.actionMasked == MotionEvent.ACTION_UP) {
+            isScrolling = false
+        } else if (event.actionMasked == MotionEvent.ACTION_MOVE) {
+            if (!isIconTouched) {
+                return false
+            }
+
+            val x = event.x - centerX
+            val y = centerY - event.y
+            if (x != 0f && y != 0f) {
+                val angle = computeAngle(x, y).toFloat()
+
+                val fixStartAngle = startAngle - fixAngle
+                val fixEndAngle = endAngle - fixAngle
+                val fixAngle = (angle - fixAngle).takeIf { it < 360 } ?: (angle - fixAngle - 360)
+
+                val resultAngle = (getAngleBetween(
+                    fixStartAngle,
+                    fixEndAngle,
+                    fixAngle,
+                    direction
+                ) ?: return false) + this.fixAngle
+
+                if (this.angle == resultAngle) {
+                    return false
+                }
+
+//                if (BuildConfig.DEBUG) {
+//                    Log.d(
+//                        "SunCircleView",
+//                        "angle: ${fixAngle}, startAngle: ${fixStartAngle}, endAngle: ${fixEndAngle}, result: ${resultAngle - this.fixAngle}"
+//                    )
+//                }
+
+                val factor = getFactorByAngle(
+                    fixStartAngle,
+                    fixEndAngle,
+                    fixAngle,
+                    direction
+                )
+                if (BuildConfig.DEBUG) {
+                    Log.d(
+                        "SunCircleView",
+                        "factor: $factor"
+                    )
+                }
+                onRotateListener?.onRotate(factor)
+
+                this.angle = resultAngle
+
+                this.invalidate()
+            }
+        }
+
+        return true
+    }
+
+    private fun getFactorByAngle(
+        start: Float,
+        end: Float,
+        middle: Float,
+        direction: ShadowMap.Direction
+    ): Float {
+        val (start, end) = when (direction) {
+            ShadowMap.Direction.CLOCKWISE -> Pair(start, end)
+            ShadowMap.Direction.COUNTERCLOCKWISE -> Pair(end, start)
+        }
+        val modEnd = if ((end - start) < 0f) end - start + 360f else end - start
+        val modMid = if ((middle - start) < 0f) middle - start + 360f else middle - start
+
+        val resultMid = if (modMid in modEnd..(modEnd + 2)) modEnd
+        else if (modMid > modEnd) 0f
+        else modMid
+
+        return resultMid / modEnd
+    }
+
+    private fun getAngleBetween(
+        s: Float,
+        e: Float,
+        mid: Float,
+        direction: ShadowMap.Direction
+    ): Float? {
+        val modDigress = 10f
+        val (start, end) = when (direction) {
+            ShadowMap.Direction.CLOCKWISE -> Pair(s - modDigress, e + modDigress)
+            ShadowMap.Direction.COUNTERCLOCKWISE -> Pair(e - modDigress, s + modDigress)
+        }
+        val modEnd = if ((end - start) < 0f) end - start + 360f else end - start
+        val modMid = if ((mid - start) < 0f) mid - start + 360f else mid - start
+
+        return if (modMid < modEnd) {
+            if (modMid in (min(modEnd - modDigress, modEnd)..max(modEnd - modDigress, modEnd))) {
+                when (direction) {
+                    ShadowMap.Direction.CLOCKWISE -> min(mid, e)
+                    ShadowMap.Direction.COUNTERCLOCKWISE -> min(mid, s)
+                }
+            } else if (modMid in 0f..<abs(modDigress)) {
+                when (direction) {
+                    ShadowMap.Direction.CLOCKWISE -> max(mid, s)
+                    ShadowMap.Direction.COUNTERCLOCKWISE -> max(mid, e)
+                }
+            } else {
+                mid
+            }
+        } else {
+            null
+        }
+    }
+
+    private fun computeAngle(x: Float, y: Float): Double {
+        var result = atan2(y.toDouble(), x.toDouble()) * RADS_TO_DEGREES
+        if (result < 0) {
+            result += 360
+        }
+        return 360 - result
+    }
 
     fun setSunAngle(factor: Float) {
+        if(isScrolling){
+            return
+        }
+
         val factor = factor.coerceIn(0f, 1f)
 
         angle = startAngle + sweepAngle * factor
@@ -428,5 +539,9 @@ class SunCircleView @JvmOverloads constructor(
 
     private enum class BadgeType {
         SUNRISE, SUNSET
+    }
+
+    companion object {
+        private const val RADS_TO_DEGREES = 360 / (Math.PI * 2)
     }
 }

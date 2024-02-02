@@ -20,6 +20,10 @@ android {
         }
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -35,6 +39,7 @@ android {
     }
     kotlinOptions {
         jvmTarget = "1.8"
+
     }
     packaging {
         resources {

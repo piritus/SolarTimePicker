@@ -60,7 +60,7 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:background="#40ff"
-        app:tickDegreesRange="120"
+        app:tickDegreesRange="90"
         app:tickWidth="1dp"
         app:tickHeight="8dp"
         app:tickColor="#090714"
@@ -110,6 +110,7 @@
         android:id="@+id/circleView"
         app:SCV_dashLength="10dp"
         android:layout_margin="4dp"
+        app:SCV_isDraggable="true"
         app:SCV_padding="4dp"
         app:SCV_sunriseText="@string/scv_sunrise_text"
         app:SCV_sunsetText="@string/scv_sunset_text"
@@ -121,4 +122,5 @@
         app:SCV_label_textAppearance="?textAppearanceCaption3"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
 </LinearLayout>
