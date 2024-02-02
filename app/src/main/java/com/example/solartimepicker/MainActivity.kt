@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import com.example.solartimepicker.solarseekbar.BiDirectionalSeekBar
+import kotlin.math.absoluteValue
 
 
 class MainActivity : ComponentActivity() {
@@ -45,13 +46,21 @@ class MainActivity : ComponentActivity() {
             }
         })
 
+        val tickViews = listOf(tickText1, tickText2)
         wheelView.onRotateListener = HorizontalWheelView.OnRotateListener { percent, tick, offset ->
             Log.d("TAG", "onRotate: percent=$percent, tick=$tick, offset=$offset")
-            tickText1.text = tick.toString()
-            tickText2.text = (tick + 1).toString()
-            tickText1.translationY = -tickText2.height * offset
-            tickText2.translationY = tickText2.height * (1 - offset)
+            val viewHeight = tickText1.height
+            val translation = viewHeight * -offset
+            val closestTickView = tickViews.minBy { (it.translationY - translation).absoluteValue }
+            closestTickView.updateTickView(tick, translation)
+            val otherTickView = tickViews.first { it != closestTickView }
+            otherTickView.updateTickView(tick + 1, viewHeight * (1 - offset))
         }
+    }
+
+    private fun TextView.updateTickView(tick: Int, translation: Float) {
+        text = tick.toString()
+        translationY = translation
     }
 }
 
