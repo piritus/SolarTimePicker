@@ -243,7 +243,7 @@ class HorizontalWheelView @JvmOverloads constructor(
         val tickDegreesDelta = tickDegreesDelta
         val wheelArcLength = wheelArcLength
         val tickLineStartY = tickCenterY - tickHeight * 0.7f
-        val tickLineStopY = tickCenterY + tickHeight + 1.3f
+        val tickLineStopY = tickCenterY + tickHeight * 1.3f
 
         if (wheelArcLength > 0 && tickDegreesDelta > 0) {
             val currentRotateDegrees = -scrollDistance * tickDegreesRange / wheelArcLength
@@ -289,7 +289,7 @@ class HorizontalWheelView @JvmOverloads constructor(
             canvas.restore()
         }
 
-        canvas.drawLine(wheelCenterX, tickLineStartY/8*3, wheelCenterX, tickLineStopY+tickHeight/8, labelTickPaint)
+        canvas.drawLine(wheelCenterX, tickLineStartY - (tickLineStopY-tickLineStartY)/8*3, wheelCenterX, tickLineStopY+(tickLineStopY-tickLineStartY)/8, labelTickPaint)
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {

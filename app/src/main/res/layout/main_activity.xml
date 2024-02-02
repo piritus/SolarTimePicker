@@ -34,7 +34,7 @@
         android:layout_height="28dp"
         android:layout_gravity="center"
         android:layout_marginTop="24dp"
-        android:translationY="7dp"
+        android:translationY="11dp"
         android:translationZ="1dp"
         android:background="@drawable/label_tick_bg"
         android:paddingHorizontal="12dp">
