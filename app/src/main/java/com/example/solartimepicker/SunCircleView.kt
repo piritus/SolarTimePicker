@@ -246,7 +246,12 @@ class SunCircleView @JvmOverloads constructor(
                     fixEndAngle,
                     fixAngle,
                     direction
-                )
+                ).let {
+                    when (direction) {
+                        ShadowMap.Direction.CLOCKWISE -> it
+                        ShadowMap.Direction.COUNTERCLOCKWISE -> 1 - it
+                    }
+                }
                 if (BuildConfig.DEBUG) {
                     Log.d(
                         "SunCircleView",
@@ -277,7 +282,7 @@ class SunCircleView @JvmOverloads constructor(
         val modEnd = if ((end - start) < 0f) end - start + 360f else end - start
         val modMid = if ((middle - start) < 0f) middle - start + 360f else middle - start
 
-        val resultMid = if (modMid in modEnd..(modEnd + 2)) modEnd
+        val resultMid = if (modMid in modEnd..(modEnd + 10)) modEnd
         else if (modMid > modEnd) 0f
         else modMid
 
@@ -326,7 +331,7 @@ class SunCircleView @JvmOverloads constructor(
     }
 
     fun setSunAngle(factor: Float) {
-        if(isScrolling){
+        if (isScrolling) {
             return
         }
 

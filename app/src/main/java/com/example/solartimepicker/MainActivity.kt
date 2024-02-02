@@ -12,10 +12,10 @@ import android.widget.TextView
 import androidx.activity.ComponentActivity
 import com.example.solartimepicker.model.ShadowMap
 import com.example.solartimepicker.solarseekbar.BiDirectionalSeekBar
-import kotlin.math.absoluteValue
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import kotlin.math.absoluteValue
 
 
 class MainActivity : ComponentActivity() {
@@ -69,7 +69,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 sampleText.text = progress.toString()
                 Log.d("TAG", "onCreate: $progress $fromUser")
-                wheelView.setRotate(progress / 72f)
+                wheelView.setRotate(progress / wheelView.tickCount.toFloat())
             }
 
             override fun onStopTrackingTouch(seekBar: BiDirectionalSeekBar?) {
@@ -77,7 +77,6 @@ class MainActivity : ComponentActivity() {
             }
         })
 
-        var lastTick = -1
         val tickViews = listOf(tickText1, tickText2)
         wheelView.onRotateListener = HorizontalWheelView.OnRotateListener { percent, tick, offset ->
             Log.d("TAG", "onRotate: percent=$percent, tick=$tick, offset=$offset")
@@ -112,8 +111,10 @@ class MainActivity : ComponentActivity() {
             sunsetAngle = sunsetAnglePref ?: 40,
             direction = directionPref ?: ShadowMap.Direction.COUNTERCLOCKWISE
         )
-        circleView.onRotateListener = SunCircleView.OnRotateListener {factor->
-            wheelView.setRotate(factor)
+        circleView.onRotateListener = SunCircleView.OnRotateListener { factor ->
+            wheelView.setRotate(
+                (factor * wheelView.tickCount).toInt() / wheelView.tickCount.toFloat()
+            )
         }
         circleView.initialize(shadowMap)
         circleView.invalidate()
