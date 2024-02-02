@@ -14,4 +14,18 @@
         <item name="android:letterSpacing">0.01</item>
         <item name="lineHeight">14sp</item>
     </style>
+
+    <style name="TextAppearance.CommonTheme.Variant.Subhead1" parent="TextAppearance.CommonTheme.Variant.Base">
+        <item name="android:textSize">12sp</item>
+        <item name="android:lineHeight">24sp</item>
+        <item name="lineHeight">24sp</item>
+    </style>
+
+    <style name="TextAppearance.CommonTheme.Variant.Base" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="android:textColor">?android:textColorPrimary</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:fontFamily">@font/grtsk_family</item>
+        <item name="fontFamily">@font/grtsk_family</item>
+        <item name="android:fontFeatureSettings">"tnum, lnum"</item>
+    </style>
 </resources>

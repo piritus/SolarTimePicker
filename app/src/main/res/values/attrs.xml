@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <attr name="textAppearanceCaption3" format="reference"/>
+    <attr name="textAppearanceVariantSubhead1" format="reference"/>
 
     <declare-styleable name="BiDirectionalSeekBar">
         <attr name="BDS_indicatorColor" format="color"/>

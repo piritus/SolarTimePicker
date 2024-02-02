@@ -30,29 +30,48 @@
         app:BDS_minValue="0" />
 
     <FrameLayout
-        android:layout_width="80dp"
-        android:layout_height="56dp"
+        android:layout_width="82dp"
+        android:layout_height="28dp"
         android:layout_gravity="center"
         android:layout_marginTop="24dp"
-        android:background="@color/teal_200"
-        android:paddingVertical="8dp">
+        android:translationY="7dp"
+        android:translationZ="1dp"
+        android:background="@drawable/label_tick_bg"
+        android:paddingHorizontal="12dp">
 
-        <TextView
+
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tickText1"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
             android:layout_gravity="center"
-            android:textSize="30sp"
-            tools:text="12" />
+            android:textAppearance="?textAppearanceVariantSubhead1"
+            android:textColor="@color/white"
+            tools:text="13:00" />
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tickText2"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
             android:layout_gravity="center"
-            android:textSize="30sp"
-            android:translationY="56dp"
-            tools:text="12" />
+            android:translationY="28dp"
+            android:textAppearance="?textAppearanceVariantSubhead1"
+            android:textColor="@color/white"
+            tools:text="13:00"  />
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="9dp"
+            android:layout_gravity="top"
+            android:background="@drawable/label_gradient_top" />
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="9dp"
+            android:layout_gravity="bottom"
+            android:background="@drawable/label_gradient_bottom" />
     </FrameLayout>
 
     <com.example.solartimepicker.HorizontalWheelView
@@ -63,10 +82,10 @@
         app:tickDegreesRange="90"
         app:tickWidth="1dp"
         app:tickHeight="8dp"
-        app:tickColor="#090714"
+        app:tickColor="@color/obsidian_900"
         app:tickFadingEdgePercent="55"
-        app:intermediateTickColor="#26090714"
-        app:labelTickColor="@color/teal_200"/>
+        app:intermediateTickColor="@color/obsidian_100_alpha_15"
+        app:labelTickColor="@color/violet_500"/>
 
     <LinearLayout
         android:layout_width="match_parent"

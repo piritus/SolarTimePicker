@@ -289,7 +289,7 @@ class HorizontalWheelView @JvmOverloads constructor(
             canvas.restore()
         }
 
-        canvas.drawLine(wheelCenterX, 0f, wheelCenterX, tickLineStopY, labelTickPaint)
+        canvas.drawLine(wheelCenterX, tickLineStartY/8*3, wheelCenterX, tickLineStopY+tickHeight/8, labelTickPaint)
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
