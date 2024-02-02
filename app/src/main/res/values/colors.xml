@@ -13,4 +13,10 @@
     <color name="colorPrimaryDark">#0D47A1</color>
     <color name="colorAccent">#64B5F6</color>
     <color name="move_button_background">#673AB7</color>
+
+    <color name="scv_path_color">#1a090714</color>
+    <color name="primary_text_default">@color/obsidian_900</color>
+
+    <color name="obsidian_100_alpha_30">#4D090714</color>
+    <color name="obsidian_900">#FF090714</color>
 </resources>

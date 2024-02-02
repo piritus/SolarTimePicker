@@ -12,6 +12,7 @@ import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Scroller
 import androidx.core.content.withStyledAttributes
+import androidx.core.graphics.ColorUtils
 import androidx.core.view.GestureDetectorCompat
 import kotlin.math.absoluteValue
 import kotlin.math.ceil
@@ -63,6 +64,14 @@ class HorizontalWheelView @JvmOverloads constructor(
         color = Color.DKGRAY
         strokeWidth = 2f
         style = Paint.Style.STROKE
+    }
+
+    private var intermediateTickColor: Int by Delegates.observable(Color.GRAY) { _, _, newValue ->
+        intermediateTickPaint.color = newValue
+    }
+
+    private var tickColor: Int by Delegates.observable(Color.DKGRAY) { _, _, newValue ->
+        tickPaint.color = newValue
     }
 
     private val intermediateTickPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -163,9 +172,9 @@ class HorizontalWheelView @JvmOverloads constructor(
     init {
         recalculateTickDegreesDelta()
         context.withStyledAttributes(attrs, R.styleable.HorizontalWheelView, defStyleAttr) {
-            tickPaint.color =
+            tickColor =
                 getColor(R.styleable.HorizontalWheelView_tickColor, Color.DKGRAY)
-            intermediateTickPaint.color =
+            intermediateTickColor =
                 getColor(R.styleable.HorizontalWheelView_intermediateTickColor, Color.GRAY)
             labelTickPaint.color =
                 getColor(R.styleable.HorizontalWheelView_labelTickColor, Color.BLACK)
@@ -179,7 +188,7 @@ class HorizontalWheelView @JvmOverloads constructor(
     }
 
     fun setRotate(percent: Float, coerced: Boolean = false) {
-        val targetScrollDistance = percent.coerceIn(0f, 100f) * wheelArcLength
+        val targetScrollDistance = percent.coerceIn(0f, 100f) * wheelArcLength //TODO скорее всего, coerceIn(0f, 1f)
         if (coerced) {
             coerceScrollDistance(targetScrollDistance)
         } else {
@@ -259,14 +268,14 @@ class HorizontalWheelView @JvmOverloads constructor(
                     255
                 }
                 if (intermediateTickCount == 0 || index % (intermediateTickCount + 1) == 0) {
-                    tickPaint.alpha = paintAlpha
+                    tickPaint.alpha = (Color.alpha(tickColor) * (paintAlpha / 255f)).toInt()
                     canvas.drawLine(
                         wheelCenterX, tickLineStartY,
                         wheelCenterX, tickLineStopY,
                         tickPaint
                     )
                 } else {
-                    intermediateTickPaint.alpha = paintAlpha
+                    intermediateTickPaint.alpha = (Color.alpha(intermediateTickColor) * (paintAlpha / 255f)).toInt()
                     canvas.drawLine(
                         wheelCenterX, intermediateTickLineStartY,
                         wheelCenterX, intermediateTickLineStopY,

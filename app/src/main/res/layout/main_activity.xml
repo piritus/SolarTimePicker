@@ -62,7 +62,63 @@
         android:background="#40ff"
         app:tickDegreesRange="120"
         app:tickWidth="1dp"
-        app:tickColor="@color/purple_700"
-        app:intermediateTickColor="@color/purple_500"
+        app:tickHeight="8dp"
+        app:tickColor="#090714"
+        app:tickFadingEdgePercent="55"
+        app:intermediateTickColor="#26090714"
         app:labelTickColor="@color/teal_200"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_margin="8dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/tvSunrise"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:inputType="numberDecimal"
+            android:hint="Восход"/>
+
+        <EditText
+            android:id="@+id/tvSunset"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:inputType="numberDecimal"
+            android:hint="Закат"/>
+
+        <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:entries="@array/spinner_direction" />
+
+        <Button
+            android:id="@+id/btnCommit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Apply"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <com.example.solartimepicker.SunCircleView
+        android:id="@+id/circleView"
+        app:SCV_dashLength="10dp"
+        android:layout_margin="4dp"
+        app:SCV_padding="4dp"
+        app:SCV_sunriseText="@string/scv_sunrise_text"
+        app:SCV_sunsetText="@string/scv_sunset_text"
+        app:SCV_label_background="@drawable/label_stroke_bg"
+        app:SCV_icon="@drawable/ic_sun"
+        app:SCV_gapLength="5.5dp"
+        app:SCV_strokeWidth="1dp"
+        app:SCV_pathColor="@color/scv_path_color"
+        app:SCV_label_textAppearance="?textAppearanceCaption3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </LinearLayout>

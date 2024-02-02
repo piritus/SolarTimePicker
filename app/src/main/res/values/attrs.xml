@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <attr name="textAppearanceCaption3" format="reference"/>
+
     <declare-styleable name="BiDirectionalSeekBar">
         <attr name="BDS_indicatorColor" format="color"/>
         <attr name="BDS_stickColor" format="color" />
@@ -21,5 +23,18 @@
         <attr name="intermediateTickCount" format="integer"/>
         <attr name="intermediateTickColor" format="color"/>
         <attr name="labelTickColor" format="color"/>
+    </declare-styleable>
+
+    <declare-styleable name="SunCircleView">
+        <attr name="SCV_label_background" format="reference"/>
+        <attr name="SCV_label_textAppearance" format="reference"/>
+        <attr name="SCV_icon" format="reference"/>
+        <attr name="SCV_sunriseText" format="string"/>
+        <attr name="SCV_sunsetText" format="string"/>
+        <attr name="SCV_padding" format="dimension"/>
+        <attr name="SCV_strokeWidth" format="dimension"/>
+        <attr name="SCV_dashLength" format="dimension"/>
+        <attr name="SCV_gapLength" format="dimension"/>
+        <attr name="SCV_pathColor" format="color"/>
     </declare-styleable>
 </resources>
