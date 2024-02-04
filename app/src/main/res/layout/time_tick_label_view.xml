@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="28dp"
+    android:background="@drawable/bg_label_tick"
+    android:paddingHorizontal="12dp">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tickText1"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textSize="12sp"
+        tools:text="13:00" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tickText2"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:translationY="28dp"
+        tools:text="13:00" />
+
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="9dp"
+        android:layout_alignParentTop="true"
+        android:translationZ="1dp"
+        android:layout_alignStart="@+id/tickText1"
+        android:layout_alignEnd="@+id/tickText1"
+        android:background="@drawable/label_gradient_top" />
+
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="9dp"
+        android:layout_alignParentBottom="true"
+        android:translationZ="1dp"
+        android:layout_alignStart="@+id/tickText1"
+        android:layout_alignEnd="@+id/tickText1"
+        android:background="@drawable/label_gradient_bottom" />
+</RelativeLayout>

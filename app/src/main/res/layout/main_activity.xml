@@ -8,89 +8,58 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/sampleText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="30sp"
-        android:gravity="center"
-        tools:text="12"
-        android:layout_marginTop="50dp" />
+<!--    <TextView-->
+<!--        android:id="@+id/sampleText"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="50dp"-->
+<!--        android:gravity="center"-->
+<!--        android:textSize="30sp"-->
+<!--        tools:text="12" />-->
 
-    <com.example.solartimepicker.solarseekbar.BiDirectionalSeekBar
-        android:id="@+id/seekBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        app:BDS_maxValue="72"
-        app:BDS_indicatorColor="#754BE9"
-        app:BDS_stickColor="#26090714"
-        app:BDS_stickGap="15dp"
-        app:BDS_labelColor="#fff"
-        app:BDS_minValue="0" />
+<!--    <com.example.solartimepicker.solarseekbar.BiDirectionalSeekBar-->
+<!--        android:id="@+id/seekBar"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="24dp"-->
+<!--        app:BDS_indicatorColor="#754BE9"-->
+<!--        app:BDS_labelColor="#fff"-->
+<!--        app:BDS_maxValue="72"-->
+<!--        app:BDS_minValue="0"-->
+<!--        app:BDS_stickColor="#26090714"-->
+<!--        app:BDS_stickGap="15dp" />-->
 
-    <FrameLayout
-        android:layout_width="82dp"
+    <com.example.solartimepicker.view.TimeTickLabelView
+        android:id="@+id/labelView"
+        android:layout_marginTop="20dp"
+        android:layout_width="wrap_content"
         android:layout_height="28dp"
         android:layout_gravity="center"
-        android:layout_marginTop="24dp"
-        android:translationY="11dp"
+        android:layout_marginBottom="-12dp"
         android:translationZ="1dp"
-        android:background="@drawable/label_tick_bg"
-        android:paddingHorizontal="12dp">
+        app:TTL_minPerTick="10"
+        app:TTL_startTime="13:00"
+        app:TTL_textAppearance="?textAppearanceVariantSubhead1"
+        app:TTL_textColor="#ffffff"
+        app:TTL_textSize="12sp" />
 
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tickText1"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:layout_gravity="center"
-            android:textAppearance="?textAppearanceVariantSubhead1"
-            android:textColor="@color/white"
-            tools:text="13:00" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tickText2"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:layout_gravity="center"
-            android:translationY="28dp"
-            android:textAppearance="?textAppearanceVariantSubhead1"
-            android:textColor="@color/white"
-            tools:text="13:00"  />
-
-        <View
-            android:layout_width="wrap_content"
-            android:layout_height="9dp"
-            android:layout_gravity="top"
-            android:background="@drawable/label_gradient_top" />
-
-        <View
-            android:layout_width="wrap_content"
-            android:layout_height="9dp"
-            android:layout_gravity="bottom"
-            android:background="@drawable/label_gradient_bottom" />
-    </FrameLayout>
-
-    <com.example.solartimepicker.HorizontalWheelView
+    <com.example.solartimepicker.view.HorizontalWheelView
         android:id="@+id/wheelView"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:background="#40ff"
-        app:tickDegreesRange="90"
-        app:tickWidth="1dp"
-        app:tickHeight="8dp"
-        app:tickColor="@color/obsidian_900"
-        app:tickFadingEdgePercent="55"
         app:intermediateTickColor="@color/obsidian_100_alpha_15"
-        app:labelTickColor="@color/violet_500"/>
+        app:labelTickColor="@color/violet_500"
+        app:tickColor="@color/obsidian_900"
+        app:tickDegreesRange="90"
+        app:tickFadingEdgePercent="55"
+        app:tickHeight="8dp"
+        app:tickWidth="1dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_margin="8dp"
         android:layout_height="wrap_content"
+        android:layout_margin="8dp"
         android:orientation="horizontal">
 
         <EditText
@@ -98,16 +67,16 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:inputType="numberDecimal"
-            android:hint="Восход"/>
+            android:hint="Восход"
+            android:inputType="numberDecimal" />
 
         <EditText
             android:id="@+id/tvSunset"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:inputType="numberDecimal"
-            android:hint="Закат"/>
+            android:hint="Закат"
+            android:inputType="numberDecimal" />
 
         <Spinner
             android:id="@+id/spinner"
@@ -125,21 +94,21 @@
             android:textSize="12sp" />
     </LinearLayout>
 
-    <com.example.solartimepicker.SunCircleView
+    <com.example.solartimepicker.view.SunCircleView
         android:id="@+id/circleView"
-        app:SCV_dashLength="10dp"
-        android:layout_margin="4dp"
-        app:SCV_isDraggable="true"
-        app:SCV_padding="4dp"
-        app:SCV_sunriseText="@string/scv_sunrise_text"
-        app:SCV_sunsetText="@string/scv_sunset_text"
-        app:SCV_label_background="@drawable/label_stroke_bg"
-        app:SCV_icon="@drawable/ic_sun"
-        app:SCV_gapLength="5.5dp"
-        app:SCV_strokeWidth="1dp"
-        app:SCV_pathColor="@color/scv_path_color"
-        app:SCV_label_textAppearance="?textAppearanceCaption3"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_margin="4dp"
+        app:SCV_dashLength="10dp"
+        app:SCV_gapLength="5.5dp"
+        app:SCV_icon="@drawable/ic_sun"
+        app:SCV_isDraggable="true"
+        app:SCV_label_background="@drawable/label_stroke_bg"
+        app:SCV_label_textAppearance="?textAppearanceCaption3"
+        app:SCV_padding="4dp"
+        app:SCV_pathColor="@color/scv_path_color"
+        app:SCV_strokeWidth="1dp"
+        app:SCV_sunriseText="@string/scv_sunrise_text"
+        app:SCV_sunsetText="@string/scv_sunset_text" />
 
 </LinearLayout>

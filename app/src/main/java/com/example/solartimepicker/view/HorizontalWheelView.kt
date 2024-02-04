@@ -1,4 +1,4 @@
-package com.example.solartimepicker
+package com.example.solartimepicker.view
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -9,12 +9,11 @@ import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Scroller
 import androidx.core.content.withStyledAttributes
-import androidx.core.graphics.ColorUtils
 import androidx.core.view.GestureDetectorCompat
+import com.example.solartimepicker.R
 import kotlin.math.absoluteValue
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -25,7 +24,7 @@ class HorizontalWheelView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : ViewGroup(context, attrs, defStyleAttr) {
+) : View(context, attrs, defStyleAttr) {
 
     fun interface OnRotateListener {
         fun onRotate(rangePercent: Float, tick: Int, tickOffset: Float)
@@ -39,7 +38,9 @@ class HorizontalWheelView @JvmOverloads constructor(
     private var isScrolling = false
 
     private var radius = 0f
-        set(value) { field = value; recalculateWheelArcLength() }
+        set(value) {
+            field = value; recalculateWheelArcLength()
+        }
 
     private var scrollDistance = 0f
         set(value) {
@@ -103,7 +104,9 @@ class HorizontalWheelView @JvmOverloads constructor(
         }
 
     var intermediateTickCount: Int = 5
-        set(value) { field = value.coerceAtLeast(0) }
+        set(value) {
+            field = value.coerceAtLeast(0)
+        }
 
     // Регулирует расстояние между делениями
     var tickDegreesRange: Int = 120
@@ -114,7 +117,9 @@ class HorizontalWheelView @JvmOverloads constructor(
         }
 
     var tickFadingEdgePercent: Int = 40
-        set(value) { field = value.coerceIn(0, 100) }
+        set(value) {
+            field = value.coerceIn(0, 100)
+        }
 
     var onRotateListener: OnRotateListener? = null
 
@@ -171,6 +176,8 @@ class HorizontalWheelView @JvmOverloads constructor(
 
     private val gestureDetector = GestureDetectorCompat(context, gestureListener)
 
+//    private val labelView: TimeTickLabelView
+private var isHeightRecalculated = false
     init {
         recalculateTickDegreesDelta()
         context.withStyledAttributes(attrs, R.styleable.HorizontalWheelView, defStyleAttr) {
@@ -183,14 +190,20 @@ class HorizontalWheelView @JvmOverloads constructor(
             tickWidth = getDimensionPixelSize(R.styleable.HorizontalWheelView_tickWidth, 2)
             tickHeight = getDimensionPixelSize(R.styleable.HorizontalWheelView_tickHeight, 24)
             tickDegreesRange = getInt(R.styleable.HorizontalWheelView_tickDegreesRange, 120)
-            tickFadingEdgePercent = getInt(R.styleable.HorizontalWheelView_tickFadingEdgePercent, 40)
+            tickFadingEdgePercent =
+                getInt(R.styleable.HorizontalWheelView_tickFadingEdgePercent, 40)
             tickCount = getInt(R.styleable.HorizontalWheelView_tickCount, 72)
             intermediateTickCount = getInt(R.styleable.HorizontalWheelView_intermediateTickCount, 5)
         }
+
+//        labelView = generateLabel(context, attrs, defStyleAttr).also {
+//            addView(it)
+//        }
     }
 
     fun setRotate(percent: Float, coerced: Boolean = false) {
-        val targetScrollDistance = percent.coerceIn(0f, 1f) * wheelArcLength //TODO скорее всего, coerceIn(0f, 1f)
+        val targetScrollDistance =
+            percent.coerceIn(0f, 1f) * wheelArcLength //TODO скорее всего, coerceIn(0f, 1f)
         if (coerced) {
             coerceScrollDistance(targetScrollDistance)
         } else {
@@ -238,7 +251,8 @@ class HorizontalWheelView @JvmOverloads constructor(
         wheelCenterX = paddingLeft + paddedWidth * 0.5f
     }
 
-    override fun dispatchDraw(canvas: Canvas) {
+//    override fun dispatchDraw(canvas: Canvas) {
+    override fun onDraw(canvas: Canvas) {
         super.dispatchDraw(canvas)
         val tickDegreesDelta = tickDegreesDelta
         val wheelArcLength = wheelArcLength
@@ -264,6 +278,7 @@ class HorizontalWheelView @JvmOverloads constructor(
                         scrollDelta < startFadingDelta -> 255
                         scrollDelta < endFadingDelta ->
                             (255 * (endFadingDelta - scrollDelta) / fadingDelta).roundToInt()
+
                         else -> 0
                     }
                 } else {
@@ -277,7 +292,8 @@ class HorizontalWheelView @JvmOverloads constructor(
                         tickPaint
                     )
                 } else {
-                    intermediateTickPaint.alpha = (Color.alpha(intermediateTickColor) * (paintAlpha / 255f)).toInt()
+                    intermediateTickPaint.alpha =
+                        (Color.alpha(intermediateTickColor) * (paintAlpha / 255f)).toInt()
                     canvas.drawLine(
                         wheelCenterX, intermediateTickLineStartY,
                         wheelCenterX, intermediateTickLineStopY,
@@ -289,12 +305,63 @@ class HorizontalWheelView @JvmOverloads constructor(
             canvas.restore()
         }
 
-        canvas.drawLine(wheelCenterX, tickLineStartY - (tickLineStopY-tickLineStartY)/8*3, wheelCenterX, tickLineStopY+(tickLineStopY-tickLineStartY)/8, labelTickPaint)
+        canvas.drawLine(
+            wheelCenterX,
+            tickLineStartY - (tickLineStopY - tickLineStartY) / 8 * 3,
+            wheelCenterX,
+            tickLineStopY + (tickLineStopY - tickLineStartY) / 8,
+            labelTickPaint
+        )
     }
 
-    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-//        TODO("Not yet implemented")
-    }
+    /** Label вынесен в отдельную view */
+//    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+//        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+//
+//        measureChild(labelView, widthMeasureSpec, heightMeasureSpec)
+//    }
+
+    /** Label вынесен в отдельную view */
+//    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+//        val childSemiWidth = labelView.measuredWidth / 2
+//        val childSemiHeight = labelView.measuredHeight / 2
+//
+//        val tickLineStartY = tickCenterY - tickHeight * 0.7f
+//        val tickLineStopY = tickCenterY + tickHeight * 1.3f
+//
+//        val pointX = (r - l) / 2
+//        val pointY = (tickLineStartY - (tickLineStopY - tickLineStartY) / 8 * 3) - childSemiHeight
+//
+//        val left = pointX.toInt() - childSemiWidth
+//        val top = pointY.toInt() - childSemiHeight
+//        val right = pointX.toInt() + childSemiWidth
+//        val bottom = pointY.toInt() + childSemiHeight
+//
+//        labelView.layout(left, top, right, bottom)
+//
+//        if(!isHeightRecalculated) {
+//            isHeightRecalculated = true
+//            this.layoutParams = layoutParams.apply {
+//                height = height.coerceAtLeast(height - top)
+//            }
+//        }
+//    }
+
+    /** Label вынесен в отдельную view */
+//    private fun generateLabel(
+//        context: Context,
+//        attrs: AttributeSet? = null,
+//        defStyleAttr: Int = 0
+//    ): TimeTickLabelView {
+//
+//        return TimeTickLabelView(context, attrs, defStyleAttr).apply {
+//            layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, 28.dp)
+//        }
+//    }
+
+//    override fun drawChild(canvas: Canvas, child: View, drawingTime: Long): Boolean {
+//        return super.drawChild(canvas, child, drawingTime)
+//    }
 
     private fun recalculateWheelArcLength() {
         wheelArcLength = (2 * Math.PI * radius * tickDegreesRange / 360).toFloat()

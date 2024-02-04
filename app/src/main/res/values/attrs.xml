@@ -39,4 +39,12 @@
         <attr name="SCV_gapLength" format="dimension"/>
         <attr name="SCV_pathColor" format="color"/>
     </declare-styleable>
+
+    <declare-styleable name="TimeTickLabelView">
+        <attr name="TTL_minPerTick" format="integer"/>
+        <attr name="TTL_startTime" format="string"/>
+        <attr name="TTL_textAppearance" format="reference"/>
+        <attr name="TTL_textSize" format="dimension"/>
+        <attr name="TTL_textColor" format="color"/>
+    </declare-styleable>
 </resources>

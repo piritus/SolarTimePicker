@@ -8,14 +8,11 @@ import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
-import android.widget.TextView
 import androidx.activity.ComponentActivity
 import com.example.solartimepicker.model.ShadowMap
-import com.example.solartimepicker.solarseekbar.BiDirectionalSeekBar
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
-import kotlin.math.absoluteValue
+import com.example.solartimepicker.view.HorizontalWheelView
+import com.example.solartimepicker.view.SunCircleView
+import com.example.solartimepicker.view.TimeTickLabelView
 
 
 class MainActivity : ComponentActivity() {
@@ -28,63 +25,24 @@ class MainActivity : ComponentActivity() {
 
     }
 
-    private val dateFormat by lazy { SimpleDateFormat("HH:mm", Locale.getDefault()) }
-
-    private val startTime = Calendar.getInstance().apply {
-        set(Calendar.HOUR_OF_DAY, 7)
-        set(Calendar.MINUTE, 0)
-        set(Calendar.MILLISECOND, 0)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.main_activity)
 
         val circleView = findViewById<SunCircleView>(R.id.circleView)
-        val sampleText = findViewById<TextView>(R.id.sampleText)
-        val seekBar = findViewById<BiDirectionalSeekBar>(R.id.seekBar)
         val wheelView = findViewById<HorizontalWheelView>(R.id.wheelView)
-        val tickText1 = findViewById<TextView>(R.id.tickText1)
-        val tickText2 = findViewById<TextView>(R.id.tickText2)
+        val labelView = findViewById<TimeTickLabelView>(R.id.labelView)
 
         val tvSunrise = findViewById<EditText>(R.id.tvSunrise)
         val tvSunset = findViewById<EditText>(R.id.tvSunset)
         val spinner = findViewById<Spinner>(R.id.spinner)
         val btnCommit = findViewById<Button>(R.id.btnCommit)
 
-        sampleText.post {
-            sampleText.text = seekBar.progress.toString()
-        }
-
-        seekBar.setOnSeekBarChangeListener(object : BiDirectionalSeekBar.OnSeekBarChangeListener {
-            override fun onStartTrackingTouch(seekBar: BiDirectionalSeekBar?) {
-                Log.d("TAG", "start touch: ")
-            }
-
-            override fun onProgressChanged(
-                seekBar: BiDirectionalSeekBar?,
-                progress: Int,
-                fromUser: Boolean
-            ) {
-                sampleText.text = progress.toString()
-                Log.d("TAG", "onCreate: $progress $fromUser")
-                wheelView.setRotate(progress / wheelView.tickCount.toFloat())
-            }
-
-            override fun onStopTrackingTouch(seekBar: BiDirectionalSeekBar?) {
-                Log.d("TAG", "stop touch: ")
-            }
-        })
-
-        val tickViews = listOf(tickText1, tickText2)
         wheelView.onRotateListener = HorizontalWheelView.OnRotateListener { percent, tick, offset ->
             Log.d("TAG", "onRotate: percent=$percent, tick=$tick, offset=$offset")
-            val viewHeight = tickText1.height
-            val translation = viewHeight * -offset
-            val closestTickView = tickViews.minBy { (it.translationY - translation).absoluteValue }
-            val otherTickView = tickViews.first { it != closestTickView }
-            otherTickView.updateTickView(tick + 1, viewHeight * (1 - offset))
+
+            labelView.setTickLabel(tick, offset)
             circleView.setSunAngle(percent)
         }
 
@@ -160,22 +118,6 @@ class MainActivity : ComponentActivity() {
     private fun getFromPreferences(key: String, defaultValue: String): String {
         val sharedPref: SharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         return sharedPref.getString(key, defaultValue) ?: defaultValue
-    }
-
-    private fun Int.time(): String {
-        val time = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, 7)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }
-        time.add(Calendar.MINUTE, this * 10)
-        return dateFormat.format(time.time)
-    }
-
-    private fun TextView.updateTickView(tick: Int, translation: Float) {
-        text = tick.time()
-        translationY = translation
     }
 }
 

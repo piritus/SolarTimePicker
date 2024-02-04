@@ -17,7 +17,6 @@
 
     <style name="TextAppearance.CommonTheme.Variant.Subhead1" parent="TextAppearance.CommonTheme.Variant.Base">
         <item name="android:textSize">12sp</item>
-        <item name="android:lineHeight">24sp</item>
         <item name="lineHeight">24sp</item>
     </style>
 

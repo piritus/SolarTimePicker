@@ -1,4 +1,4 @@
-package com.example.solartimepicker
+package com.example.solartimepicker.view
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -15,6 +15,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.withStyledAttributes
+import com.example.solartimepicker.BuildConfig
+import com.example.solartimepicker.R
+import com.example.solartimepicker.dp
 import com.example.solartimepicker.model.ShadowMap
 import com.google.android.material.textview.MaterialTextView
 import kotlin.math.abs
