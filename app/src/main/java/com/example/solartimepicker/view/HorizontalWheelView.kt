@@ -9,6 +9,7 @@ import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Scroller
 import androidx.core.content.withStyledAttributes
@@ -24,7 +25,7 @@ class HorizontalWheelView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : View(context, attrs, defStyleAttr) {
+) : ViewGroup(context, attrs, defStyleAttr) {
 
     fun interface OnRotateListener {
         fun onRotate(rangePercent: Float, tick: Int, tickOffset: Float)
@@ -35,7 +36,9 @@ class HorizontalWheelView @JvmOverloads constructor(
     private var wheelCenterX = 0f
     private var wheelCenterY = 0f
     private var wheelArcLength = 0f
-    private var isScrolling = false
+    private var isScrolling: Boolean by Delegates.observable(false) { _, _, newValue ->
+        requestDisallowInterceptTouchEvent(newValue)
+    }
 
     private var radius = 0f
         set(value) {
@@ -252,7 +255,7 @@ private var isHeightRecalculated = false
     }
 
 //    override fun dispatchDraw(canvas: Canvas) {
-    override fun onDraw(canvas: Canvas) {
+    override fun dispatchDraw(canvas: Canvas) {
         super.dispatchDraw(canvas)
         val tickDegreesDelta = tickDegreesDelta
         val wheelArcLength = wheelArcLength
@@ -312,6 +315,9 @@ private var isHeightRecalculated = false
             tickLineStopY + (tickLineStopY - tickLineStartY) / 8,
             labelTickPaint
         )
+    }
+
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
     }
 
     /** Label вынесен в отдельную view */
