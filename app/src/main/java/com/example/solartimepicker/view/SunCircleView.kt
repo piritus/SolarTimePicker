@@ -42,7 +42,10 @@ class SunCircleView @JvmOverloads constructor(
     // Переменные для перемещения иконки жестом
     private var startX = 0f
     private var startY = 0f
-    private var isIconTouched = false
+    private var isDraggable = false
+    private var isScrolling: Boolean by Delegates.observable(false) { _, _, newValue ->
+        requestDisallowInterceptTouchEvent(newValue)
+    }
 
     // Отступ от бейджа (восход/закат) по вертикали
     private val badgeVerticalMargin = 16.dp
@@ -57,8 +60,6 @@ class SunCircleView @JvmOverloads constructor(
     private var icon: Drawable? = null
 
     private var isInitialized = false
-    private var isDraggable = false
-    private var isScrolling = false
 
     private var radius: Float by Delegates.notNull()
     private var centerX: Float by Delegates.notNull()
@@ -200,42 +201,51 @@ class SunCircleView @JvmOverloads constructor(
             return false
         }
 
-        if (event.actionMasked == MotionEvent.ACTION_DOWN) {
-            isScrolling = true
-            startX = event.x
-            startY = event.y
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                startX = event.x
+                startY = event.y
 
-            isIconTouched = iconRect.contains(
-                startX.toInt(),
-                startY.toInt()
-            )
-            return true
-        } else if (event.actionMasked == MotionEvent.ACTION_UP) {
-            isScrolling = false
-        } else if (event.actionMasked == MotionEvent.ACTION_MOVE) {
-            if (!isIconTouched) {
-                return false
+                isScrolling = iconRect.contains(
+                    startX.toInt(),
+                    startY.toInt()
+                )
+
+                return true
             }
 
-            val x = event.x - centerX
-            val y = centerY - event.y
-            if (x != 0f && y != 0f) {
-                val angle = computeAngle(x, y).toFloat()
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                if (isScrolling) {
+                    isScrolling = false
+                    return true
+                }
+            }
 
-                val fixStartAngle = startAngle - fixAngle
-                val fixEndAngle = endAngle - fixAngle
-                val fixAngle = (angle - fixAngle).takeIf { it < 360 } ?: (angle - fixAngle - 360)
-
-                val resultAngle = (getAngleBetween(
-                    fixStartAngle,
-                    fixEndAngle,
-                    fixAngle,
-                    direction
-                ) ?: return false) + this.fixAngle
-
-                if (this.angle == resultAngle) {
+            MotionEvent.ACTION_MOVE -> {
+                if (!isScrolling) {
                     return false
                 }
+
+                val x = event.x - centerX
+                val y = centerY - event.y
+                if (x != 0f && y != 0f) {
+                    val angle = computeAngle(x, y).toFloat()
+
+                    val fixStartAngle = startAngle - fixAngle
+                    val fixEndAngle = endAngle - fixAngle
+                    val fixAngle =
+                        (angle - fixAngle).takeIf { it < 360 } ?: (angle - fixAngle - 360)
+
+                    val resultAngle = (getAngleBetween(
+                        fixStartAngle,
+                        fixEndAngle,
+                        fixAngle,
+                        direction
+                    ) ?: return false) + this.fixAngle
+
+                    if (this.angle == resultAngle) {
+                        return false
+                    }
 
 //                if (BuildConfig.DEBUG) {
 //                    Log.d(
@@ -244,28 +254,29 @@ class SunCircleView @JvmOverloads constructor(
 //                    )
 //                }
 
-                val factor = getFactorByAngle(
-                    fixStartAngle,
-                    fixEndAngle,
-                    fixAngle,
-                    direction
-                ).let {
-                    when (direction) {
-                        ShadowMap.Direction.CLOCKWISE -> it
-                        ShadowMap.Direction.COUNTERCLOCKWISE -> 1 - it
+                    val factor = getFactorByAngle(
+                        fixStartAngle,
+                        fixEndAngle,
+                        fixAngle,
+                        direction
+                    ).let {
+                        when (direction) {
+                            ShadowMap.Direction.CLOCKWISE -> it
+                            ShadowMap.Direction.COUNTERCLOCKWISE -> 1 - it
+                        }
                     }
-                }
-                if (BuildConfig.DEBUG) {
-                    Log.d(
-                        "SunCircleView",
-                        "factor: $factor"
-                    )
-                }
-                onRotateListener?.onRotate(factor)
+                    if (BuildConfig.DEBUG) {
+                        Log.d(
+                            "SunCircleView",
+                            "factor: $factor"
+                        )
+                    }
+                    onRotateListener?.onRotate(factor)
 
-                this.angle = resultAngle
+                    this.angle = resultAngle
 
-                this.invalidate()
+                    this.invalidate()
+                }
             }
         }
 
